@@ -24,22 +24,25 @@ def identificar_plantas():
 
     file = request.files["pdf"]
     doc = fitz.open(stream=file.read(), filetype="pdf")
-    resultado = []
+    try:
+        resultado = []
 
-    for i, page in enumerate(doc):
-        texto = page.get_text().lower()
-        tipo_detectado = None
-        for chave, tipo_padrao in TIPOS_CHAVE.items():
-            if chave in texto:
-                tipo_detectado = tipo_padrao
-                break
+        for i, page in enumerate(doc):
+            texto = page.get_text().lower()
+            tipo_detectado = None
+            for chave, tipo_padrao in TIPOS_CHAVE.items():
+                if chave in texto:
+                    tipo_detectado = tipo_padrao
+                    break
 
-        resultado.append({
-            "pagina": i + 1,
-            "tipo_detectado": tipo_detectado or "desconhecido"
-        })
+            resultado.append({
+                "pagina": i + 1,
+                "tipo_detectado": tipo_detectado or "desconhecido"
+            })
 
-    return jsonify(resultado)
+        return jsonify(resultado)
+    finally:
+        doc.close()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
