@@ -19,6 +19,16 @@ TIPOS_CHAVE = {
 
 @app.route("/identificar_plantas", methods=["POST"])
 def identificar_plantas():
+    """Receives a PDF file via ``multipart/form-data`` and returns a JSON array
+    with the detected page types.
+
+    **Request**
+        - ``pdf``: file field containing the plan PDF.
+
+    **Response**
+        ``200``: ``[{'pagina': int, 'tipo_detectado': str}, ...]``
+        ``400``: ``{'erro': 'PDF não enviado'}`` when the ``pdf`` field is missing.
+    """
     if "pdf" not in request.files:
         return jsonify({"erro": "PDF não enviado"}), 400
 
