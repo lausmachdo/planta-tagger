@@ -23,21 +23,22 @@ def identificar_plantas():
         return jsonify({"erro": "PDF não enviado"}), 400
 
     file = request.files["pdf"]
-    doc = fitz.open(stream=file.read(), filetype="pdf")
     resultado = []
 
-    for i, page in enumerate(doc):
-        texto = page.get_text().lower()
-        tipo_detectado = None
-        for chave, tipo_padrao in TIPOS_CHAVE.items():
-            if chave in texto:
-                tipo_detectado = tipo_padrao
-                break
+    # Use a context manager so the document is automatically closed
+    with fitz.open(stream=file.read(), filetype="pdf") as doc:
+        for i, page in enumerate(doc):
+            texto = page.get_text().lower()
+            tipo_detectado = None
+            for chave, tipo_padrao in TIPOS_CHAVE.items():
+                if chave in texto:
+                    tipo_detectado = tipo_padrao
+                    break
 
-        resultado.append({
-            "pagina": i + 1,
-            "tipo_detectado": tipo_detectado or "desconhecido"
-        })
+            resultado.append({
+                "pagina": i + 1,
+                "tipo_detectado": tipo_detectado or "desconhecido"
+            })
 
     return jsonify(resultado)
 
